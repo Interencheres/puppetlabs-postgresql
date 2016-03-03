@@ -11,6 +11,7 @@ define postgresql::server::role(
   $replication      = false,
   $connection_limit = '-1',
   $username         = $title,
+  $aws_rds          = false,
   $connect_settings = $postgresql::server::default_connect_settings,
 ) {
   $psql_user  = $postgresql::server::user
@@ -106,7 +107,7 @@ define postgresql::server::role(
     unless => "SELECT rolname FROM pg_roles WHERE rolname='${username}' and rolconnlimit=${connection_limit}",
   }
 
-  if $password_hash {
+  if $password_hash and !$aws_rds {
     if($password_hash =~ /^md5.+/) {
       $pwd_hash_sql = $password_hash
     } else {
